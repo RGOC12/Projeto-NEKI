@@ -1,0 +1,75 @@
+.wrapper {
+  width:400px;
+  height:350px;
+  position: fixed;
+  top: 20%;
+  left: 26%;
+  transform: translate(-50% -50%);
+  padding: 20px;
+  background-color: rgba(0, 0, 255, 0.5);
+  backdrop-filter: blur(5px);
+  border-Radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  }
+
+  .entrar {
+           width:150px;
+          margin-top: 20px;
+          margin-left: 100px;
+          padding: 10px;
+          border: none;
+          border-radius: 5px;
+          background-color: #007bff;
+          color: #fff;
+          cursor: pointer;
+    }
+
+    .entrar:hover {
+      background-color: darkblue; /* Cor mais escura quando passar o mouse */
+  }
+
+    .entrada {
+      margin-left: 20px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 90%;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+     .gravar {
+      margin-left: 30px;
+     }
+
+     .Logotipo {
+      position: absolute;
+      right: 20px; /* Ajuste a posição conforme necessário */
+      top: 50%; /* Centraliza verticalmente */
+      transform: translateY(-50%);
+      width: 500px; /* Defina o tamanho da imagem */
+      height: 500px;
+    }
+
+    p {
+      margin-top: 35px;
+      margin-left: 30px;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .wrapper {
+        width: 80%;
+        height: auto;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    

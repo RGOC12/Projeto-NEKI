@@ -1,0 +1,52 @@
+/* css da page Home */
+
+.container {
+  width:100%;
+  min-height:100vh;
+
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container img {
+  height:500px;
+
+}
+
+.container p {
+  font-size: 3rem;
+  font-weight:bold;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  width:150px;
+  height:40px;
+  font-size: 1.125rem;
+  font-weight: bold;
+  border: 0;
+  border-radius: 8px;
+  background-color: navy;
+  cursor: pointer;
+  margin-right: 80px;
+}
+
+.btn:hover {
+  background-color: aquamarine;
+}
+
+.butto {
+  width:150px;
+  height:40px;
+  font-size: 1.125rem;
+  font-weight: bold;
+  border: 0;
+  border-radius: 8px;
+  background-color: navy;
+  cursor: pointer;
+}
+
+.butto:hover {
+  background-color: aquamarine;
+}
