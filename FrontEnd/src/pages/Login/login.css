@@ -1,6 +1,6 @@
 .wrapper {
   width:400px;
-  height:350px;
+  height:auto;
   position: fixed;
   top: 20%;
   left: 26%;
@@ -60,6 +60,17 @@
     p {
       margin-top: 35px;
       margin-left: 30px;
+    }
+
+    .input-box {
+      position: relative;
+    }
+    
+    .icon {
+      display: flex;
+      margin-left: 300px;
+      position: absolute;
+      transform: translateY(-50%);
     }
 
     @media only screen and (max-width: 600px) {

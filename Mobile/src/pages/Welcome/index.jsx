@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableHighlight} from 'react-native'
+import { View, Text, TouchableHighlight} from 'react-native'
 import React from 'react'
 import {styles} from "./style"
 import * as Animatable from 'react-native-animatable'

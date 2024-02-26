@@ -4,13 +4,12 @@ import axios from 'axios';
 import './Cadastro.css';
 import Logo from '../../assets/Logo-Neki.png';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
 export default function Cadastro() {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // Novo estado para a confirmação da senha
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarSenhaConfirmacao, setMostrarSenhaConfirmacao] = useState(false);
   const [mensagemErro, setMensagemErro] = useState('');
@@ -20,21 +19,25 @@ export default function Cadastro() {
   const handleCadastro = async (e) => {
     e.preventDefault();
 
-    if (nome === '' || email === '' || senha === '') {
+    if (login === '' || password === '' || confirmPassword === '') {
       setMensagemErro('Preencha todos os campos');
       return;
     }
 
-    try {
-      const response = await axios.get(`https://65676a8c64fcff8d731055ca.mockapi.io/User?email=${email}`);
+    if (password !== confirmPassword) {
+      setMensagemErro('A senha e a confirmação da senha não coincidem');
+      return;
+    }
 
-      if (response.data.length > 0) {
-        setMensagemErro('Email já cadastrado');
-        await axios.post('https://65676a8c64fcff8d731055ca.mockapi.io/User', { nome, email, senha });
-        setMensagemErro('');
-        console.log('Cadastro efetuado com sucesso!');
-        navigate('/');
-      }
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      await axios.post('http://localhost:8080/auth/register', { login, password }, {headers});
+      setMensagemErro('');
+      console.log('Cadastro efetuado com sucesso!');
+      navigate('/');
     } catch (error) {
       console.error(error);
       setMensagemErro('Ocorreu um erro ao cadastrar. Tente novamente mais tarde.');
@@ -51,7 +54,6 @@ export default function Cadastro() {
 
   return (
     <div>
-        <Header />
         <img src={Logo} alt="Logotipo" className="Logotipo" />
       <div className="container">
       <form className="cadastro" onSubmit={handleCadastro}>
@@ -59,28 +61,20 @@ export default function Cadastro() {
         <h1 className="title">Cadastro</h1>
         <input
           className="campo"
-          type="text"
-          name="nome"
-          placeholder="Nome completo"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-        />
-        <input
-          className="campo"
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="login"
+          name="login"
+          placeholder="Login"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
         />
         <div className="senha-container">
           <input
-            className="campo senha"
-            name="senha"
+            className="campo password"
+            name="password"
             type={mostrarSenha ? 'text' : 'password'}
-            placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           {mostrarSenha ? <FaEyeSlash className="olho" onClick={toggleMostrarSenha} /> : <FaEye className="olho" onClick={toggleMostrarSenha} />}
         </div>
@@ -90,6 +84,8 @@ export default function Cadastro() {
             name="confirmarSenha"
             type={mostrarSenhaConfirmacao ? 'text' : 'password'}
             placeholder="Confirmar senha"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)} // Adicionando o estado para a confirmação da senha
           />
           {mostrarSenhaConfirmacao ? <FaEyeSlash className="olho" onClick={toggleMostrarSenhaConfirmacao} /> : <FaEye className="olho" onClick={toggleMostrarSenhaConfirmacao} />}
         </div>

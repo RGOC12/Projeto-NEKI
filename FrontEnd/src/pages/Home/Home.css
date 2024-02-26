@@ -1,3 +1,10 @@
 .foto{
     margin-top: 0px;
 }
+.Skills{
+   
+    flex-direction: column;
+    background-color: blue;
+    flex: 1;
+    
+}

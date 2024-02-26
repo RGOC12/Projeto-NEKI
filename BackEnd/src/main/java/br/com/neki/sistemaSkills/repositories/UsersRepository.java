@@ -7,7 +7,7 @@ import br.com.neki.sistemaSkills.entities.Users;
 
 
 
-public interface UsersRepository extends JpaRepository<Users,Integer>{
+public interface UsersRepository extends JpaRepository<Users,String>{
 
 	UserDetails findByLogin(Object login);
 }

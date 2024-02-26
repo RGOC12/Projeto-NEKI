@@ -33,13 +33,17 @@ public class TokenService {
 	}
 
 	public String validateToken(String token) {
-		try {
-
-			Algorithm algorithm = Algorithm.HMAC256(secret);
-			return JWT.require(algorithm).withIssuer("auth-api").build().verify(token).getSubject();
-		} catch (JWTVerificationException exception) {
-			return "";
-		}
+		System.out.println("token recebido pelo validateToken" + token);
+	    try {
+	        Algorithm algorithm = Algorithm.HMAC256(secret);
+	        return JWT.require(algorithm).withIssuer("auth-api").build().verify(token).getSubject();
+	    } catch (JWTVerificationException exception) {
+	        // Adicione log para imprimir informações sobre a exceção
+	        exception.printStackTrace();
+	        
+	        // Lance novamente a exceção (opcional)
+	        throw exception;
+	    }
 	}
 
 	private Instant genExpirationDate() {

@@ -7,6 +7,7 @@
   display:flex;
   align-items: center;
   justify-content: center;
+  background-color: brown;
 }
 
 .container img {
@@ -21,6 +22,7 @@
 }
 
 .btn {
+  
   width:150px;
   height:40px;
   font-size: 1.125rem;
@@ -30,6 +32,7 @@
   background-color: navy;
   cursor: pointer;
   margin-right: 80px;
+  margin-top : 10px;
 }
 
 .btn:hover {
@@ -45,6 +48,7 @@
   border-radius: 8px;
   background-color: navy;
   cursor: pointer;
+  margin-right: 5px;
 }
 
 .butto:hover {

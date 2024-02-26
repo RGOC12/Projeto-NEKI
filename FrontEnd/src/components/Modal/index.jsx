@@ -1,114 +1,102 @@
-import React, { useState } from 'react';
-import { ChevronUp, ChevronDown, CheckCircle2 } from 'lucide-react';
-import { FaJava, FaJs, FaReact, FaPython, FaPhp } from 'react-icons/fa';
-import './Modal.css';
+import React from 'react';
+import axios from 'axios';
+import Select from 'react-select';
 
 const BACKGROUND_STYLE = {
-    position: 'fixed',
-    top: '0',
-    bottom: '0',
-    left: '0',
-    right: '0',
-    backgroundColor: 'rgb(0,0,0, 0.7)',
-    zIndex: '1000',
-    color: 'black'
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.7)',
+  zIndex: 100,
 };
 
 const MODAL_STYLE = {
-    position: 'fixed',
-    top: '20%',
-    left: '26%',
-    transform: 'translate(-50% -50%)',
-    padding: '20px',
-    backgroundColor: 'rgba(0, 0, 255, 0.5)', /* Azul transparente */
-    backdropFilter: 'blur(5px)', /* Efeito meio fosco */
-    borderRadius: '10px',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', /* Sombreamento */
-    zIndex: '1000'
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  backgroundColor: 'rgba(0, 0, 255, 0.5)',
+  backdropFilter: 'blur(5px)',
+  zIndex: 1000,
+  height: 180,
+  width: 400,
+  padding: 20,
+  borderRadius: 10,
 };
 
-function Modal({ isOpen, setModalOpen, children }) {
-    const [showOptions, setShowOptions] = useState(false);
+const API_URL = 'http://localhost:8080';
 
-    const toggleOptions = () => {
-        setShowOptions((prevShowOptions) => !prevShowOptions);
+const Modal = ({ isOpen, setModalOpen, onSkillSave }) => {
+  const [selectedSkill, setSelectedSkill] = React.useState(null);
+  const token = localStorage.getItem('token');
+  const [skills, setSkills] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchSkills = async (token) => {
+      if (isOpen) {
+        try {
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          };
+
+          const response = await axios.get(`${API_URL}/skills/skills`, { headers });
+          // Transforme a resposta da API para o formato esperado pelo react-select
+          const formattedSkills = response.data.map(skill => ({
+            value: skill.skillId,
+            label: skill.name,
+          }));
+
+          setSkills(formattedSkills);
+        } catch (error) {
+          console.error('Erro ao carregar skills:', error);
+        }
+      }
     };
 
-    if (isOpen) {
-        return (
-            <div style={BACKGROUND_STYLE}>
-                <div style={MODAL_STYLE}>
-                    <div>{children}</div>
+    fetchSkills(token);
+  }, [isOpen, token]);
 
-                    <div className="select">
-                        <div id="category-select">
-                            <label htmlFor="options-view-button">Skills</label>
+  const handleSave = async () => {
+    if (selectedSkill) {
+      const skillId = selectedSkill.value;
+      const levelId = 1;
 
-                            <input type="checkbox" id="options-view-button" onChange={toggleOptions} checked={showOptions} />
-                            <div id="select-button">
-                                <div id="selected-value">Selecione a skill</div>
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      };
 
-                                <div id="chevrons">
-                                    {showOptions ? <ChevronUp className="chevron-up" /> : <ChevronDown className="chevron-down" />}
-                                </div>
-                            </div>
-                        </div>
-                        <ul id="options" style={{ display: showOptions ? 'block' : 'none' }}>
-                            <li className="option">
-                                <input type="radio"
-                                    name="category"
-                                    value="linguagem"
-                                    data-label="React"></input>
-
-                                <FaReact />
-                                <span className="label">React</span>
-                                <CheckCircle2 className="check" />
-                            </li>
-                            <li className="option">
-                                <input type="radio"
-                                    name="category"
-                                    value="linguagem"
-                                    data-label="Javascript"></input>
-                                <FaJs />
-                                <span className="label">Javascript</span>
-                                <CheckCircle2 className="check" />
-                            </li>
-                            <li className="option">
-                                <input type="radio"
-                                    name="category"
-                                    value="linguagem"
-                                    data-label="Java"></input>
-                                <FaJava />
-                                <span className="label">Java</span>
-                                <CheckCircle2 className='check' />
-                            </li>
-                            <li className="option">
-                                <input type="radio"
-                                    name="category"
-                                    value="linguagem"
-                                    data-label="Python"></input>
-                                <FaPython />
-                                <span className="label">Python</span>
-                                <CheckCircle2 className="check" />
-                            </li>
-                            <li className="option">
-                                <input type="radio"
-                                    name="category"
-                                    value="linguagem"
-                                    data-label="PHP"></input>
-                                <FaPhp />
-                                <span className="label">PHP</span>
-                                <CheckCircle2 className="check" />
-                            </li>
-                        </ul>
-                    </div>
-                    <button className="fechar" onClick={setModalOpen}>Cancelar</button>
-                    <button className="adicionar" onClick={""}>Salvar</button>
-                </div>
-            </div>
-        );
+      try {
+        await axios.post(`${API_URL}/skills?skillId=${skillId}&levelId=${levelId}`, null, { headers });
+        alert('Habilidade salva com sucesso!');
+        setModalOpen(false);
+        onSkillSave(); // Chama a função de atualização após salvar
+      } catch (error) {
+        alert('Erro ao salvar habilidade: ' + error.message);
+      }
+    } else {
+      alert('Selecione uma habilidade antes de salvar.');
     }
-    return null;
-}
+  };
+
+  return (
+    <div className="modal" style={{ BACKGROUND_STYLE, display: isOpen ? 'block' : 'none' }}>
+      <div style={MODAL_STYLE}>
+        <h2>Selecionar Habilidade</h2>
+        <Select
+          value={selectedSkill}
+          onChange={setSelectedSkill}
+          options={skills}
+          placeholder="Selecione uma habilidade"
+        />
+        <button className="btn" onClick={handleSave}>Salvar</button>
+      <button className="btn" onClick={() => setModalOpen(false)}>Cancelar</button>
+      </div>
+    </div>
+  );
+};
 
 export default Modal;

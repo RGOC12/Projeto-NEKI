@@ -3,6 +3,7 @@ package br.com.neki.sistemaSkills.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import br.com.neki.sistemaSkills.dtos.SkillsDTO;
 import br.com.neki.sistemaSkills.dtos.SkillsResponseDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ public class Skills {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer skillsId;
+	private Integer skillId;
 	private String imageUrl;
 	private String name;
 	private String description;
@@ -35,9 +36,9 @@ public class Skills {
 	}
 
 
-	public Skills(Integer skillsId, String imageUrl, String name, String description, Levels levels) {
+	public Skills(Integer skillId, String imageUrl, String name, String description, Levels levels) {
 		super();
-		this.skillsId = skillsId;
+		this.skillId = skillId;
 		this.imageUrl = imageUrl;
 		this.name = name;
 		this.description = description;
@@ -49,17 +50,22 @@ public class Skills {
 		this.imageUrl = skillsResponseDTO.imageUrl();
 		this.name = skillsResponseDTO.name();
 		this.description = skillsResponseDTO.description();
-		this.levels = levels;
+	}
+
+	
+	public Skills(SkillsDTO skillsDTO) {
+		this.name = skillsDTO.name();
+		this.description = skillsDTO.description();
+		this.skillId = skillsDTO.skillId();
+	}
+	
+	public Integer getSkillId() {
+		return skillId;
 	}
 
 
-	public Integer getSkillsId() {
-		return skillsId;
-	}
-
-
-	public void setSkillsId(Integer skillsId) {
-		this.skillsId = skillsId;
+	public void setSkillId(Integer skillId) {
+		this.skillId = skillId;
 	}
 
 

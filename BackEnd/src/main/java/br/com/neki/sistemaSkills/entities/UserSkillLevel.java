@@ -14,7 +14,7 @@ public class UserSkillLevel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private Integer userSkillLevelid;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -34,9 +34,11 @@ public class UserSkillLevel {
 	
 	
 
-	public UserSkillLevel(Long id, Users user, Skills skill, Levels level) {
+	
+
+	public UserSkillLevel(Integer userSkillLevelid, Users user, Skills skill, Levels level) {
 		super();
-		this.id = id;
+		this.userSkillLevelid = userSkillLevelid;
 		this.user = user;
 		this.skill = skill;
 		this.level = level;
@@ -44,13 +46,23 @@ public class UserSkillLevel {
 
 
 
-	public Long getId() {
-		return id;
+
+
+	public Integer getUserSkillLevelid() {
+		return userSkillLevelid;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+
+
+
+
+	public void setUserSkillLevelid(Integer userSkillLevelid) {
+		this.userSkillLevelid = userSkillLevelid;
 	}
+
+
+
+
 
 	public Users getUser() {
 		return user;

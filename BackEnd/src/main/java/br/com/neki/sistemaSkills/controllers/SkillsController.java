@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,45 +41,37 @@ public class SkillsController {
 
 	@Autowired
 	SkillsService skillsService;
-	
+
 	@Autowired
 	LevelsService levelsService;
-	
+
 	@Autowired
 	private UserSkillLevelRepository userSkillLevelRepo;
-	
-	
 
 	@SecurityRequirement(name = "bearerAuth")
 	@GetMapping
 	public ResponseEntity<List<SkillsResponseDTO>> listarSkills() {
-	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    Object principal = authentication.getPrincipal();
-	    Users user = null;
-	    if (principal instanceof Users) {
-	        user = (Users) principal;
-	    }
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Object principal = authentication.getPrincipal();
+		Users user = null;
+		if (principal instanceof Users) {
+			user = (Users) principal;
+		}
 
-	    
-	    List<UserSkillLevel> userSkillLevels = userSkillLevelRepo.findByUser(user);
+		List<UserSkillLevel> userSkillLevels = userSkillLevelRepo.findByUser(user);
 
-	    
-	    List<SkillsResponseDTO> skillsResponseDTOs = new ArrayList<>();
-	    for (UserSkillLevel userSkillLevel : userSkillLevels) {
-	        Skills skill = userSkillLevel.getSkill();
-	        Levels level = userSkillLevel.getLevel();
+		List<SkillsResponseDTO> skillsResponseDTOs = new ArrayList<>();
+		for (UserSkillLevel userSkillLevel : userSkillLevels) {
+			Skills skill = userSkillLevel.getSkill();
+			Levels level = userSkillLevel.getLevel();
 
-	        SkillsResponseDTO skillsResponseDTO = new SkillsResponseDTO(
-	                skill.getImageUrl(),
-	                skill.getName(),
-	                skill.getDescription(),
-	                level.getLevel()
-	        );
+			SkillsResponseDTO skillsResponseDTO = new SkillsResponseDTO(skill.getSkillId(), skill.getImageUrl(),
+					skill.getName(), skill.getDescription(), level.getLevel());
 
-	        skillsResponseDTOs.add(skillsResponseDTO);
-	    }
+			skillsResponseDTOs.add(skillsResponseDTO);
+		}
 
-	    return new ResponseEntity<>(skillsResponseDTOs, HttpStatus.OK);
+		return new ResponseEntity<>(skillsResponseDTOs, HttpStatus.OK);
 	}
 
 	@SecurityRequirement(name = "bearerAuth")
@@ -95,67 +88,88 @@ public class SkillsController {
 
 	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping
-	public ResponseEntity<Void> associarSkillNivel(
-	        @RequestParam Integer skillId,
-	        @RequestParam Integer levelId) {
-	    
-	    Skills skill = skillsService.buscarSkillPorId(skillId);
+	public ResponseEntity<Void> associarSkillNivel(@RequestParam Integer skillId, @RequestParam Integer levelId) {
 
-	    Levels level = levelsService.buscarLevelPorId(levelId);
+		Skills skill = skillsService.buscarSkillPorId(skillId);
 
-	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        Users user = null;
-        if (principal instanceof Users) {
-            user = (Users) principal;
-        }
+		Levels level = levelsService.buscarLevelPorId(levelId);
 
-	    if (user != null && skill != null && level != null) {
-	      
-	        UserSkillLevel userSkillLevel = new UserSkillLevel();
-	        userSkillLevel.setUser(user);
-	        userSkillLevel.setSkill(skill);
-	        userSkillLevel.setLevel(level);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Object principal = authentication.getPrincipal();
+		Users user = null;
+		if (principal instanceof Users) {
+			user = (Users) principal;
+		}
 
-	       
-	        userSkillLevelRepo.save(userSkillLevel);
-	    }
+		if (user != null && skill != null && level != null) {
 
-	    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			UserSkillLevel userSkillLevel = new UserSkillLevel();
+			userSkillLevel.setUser(user);
+			userSkillLevel.setSkill(skill);
+			userSkillLevel.setLevel(level);
+
+			userSkillLevelRepo.save(userSkillLevel);
+		}
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@SecurityRequirement(name = "bearerAuth")
+	@PutMapping
+	public ResponseEntity<Void> atualizacaoSkillNivel(@RequestParam Integer skillId, @RequestParam Integer levelId) {
+
+		// Obtém o usuário autenticado
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Object principal = authentication.getPrincipal();
+		Users user = null;
+		if (principal instanceof Users) {
+			user = (Users) principal;
+		}
+
+		// Verifica se o usuário, a habilidade e o nível existem
+		Skills skill = skillsService.buscarSkillPorId(skillId);
+		Levels level = levelsService.buscarLevelPorId(levelId);
+
+		if (user != null && skill != null && level != null) {
+
+			// Verifica se já existe uma entrada para essa habilidade e usuário
+			UserSkillLevel existingUserSkillLevel = userSkillLevelRepo.findByUserAndSkill(user, skill);
+
+			if (existingUserSkillLevel != null) {
+				// Se já existe, atualiza o nível
+				existingUserSkillLevel.setLevel(level);
+				userSkillLevelRepo.save(existingUserSkillLevel);
+			} else {
+				// Se não existe, cria uma nova entrada
+				UserSkillLevel newUserSkillLevel = new UserSkillLevel();
+				newUserSkillLevel.setUser(user);
+				newUserSkillLevel.setSkill(skill);
+				newUserSkillLevel.setLevel(level);
+
+				userSkillLevelRepo.save(newUserSkillLevel);
+			}
+
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			// Se o usuário, a habilidade ou o nível não existirem, retorna um erro
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 //	@SecurityRequirement(name = "bearerAuth")
-//	@PutMapping
-//	public ResponseEntity<Skills> atualizarSkill(@RequestBody SkillsDTO updatedSkill)
-//			throws RuntimeException, IllegalAccessException, InvocationTargetException {
-//		Skills existingSkill = skillsService.buscarSkillPorId(updatedSkill.getSkillsId());
+//	@DeleteMapping
+//	public ResponseEntity<?> delete(@RequestParam Integer skillId) {
+//	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    Users user = (Users) authentication.getPrincipal();
 //
-//		for (Field field : updatedSkill.getClass().getDeclaredFields()) {
-//			field.setAccessible(true);
-//			Object value = field.get(updatedSkill);
+//	    String userId = user.getUserId(); // Extraia o ID do usuário da classe Users
 //
-//			try {
-//				Method getter = field.getDeclaringClass().getMethod(
-//						"get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
-//				if (getter.invoke(updatedSkill) != null) {
-//					field.set(existingSkill, value);
-//				}
-//			} catch (NoSuchMethodException e) {
+//	    UserSkillLevel association = userSkillLevelRepo.findBySkillIdAndUserId(skillId, userId);
+//	    if (association == null) {
+//	        return ResponseEntity.notFound().build();
+//	    }
 //
-//			}
-//		}
-//
-//		return new ResponseEntity<>(skillsService.atualizarSkill(existingSkill), HttpStatus.OK);
+//	    userSkillLevelRepo.delete(association);
+//	    return ResponseEntity.noContent().build();
 //	}
-
-	@SecurityRequirement(name = "bearerAuth")
-	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deletarSkill(@PathVariable("id") Integer id) {
-
-		if (skillsService.deletarSkillPorId(id)) {
-			return new ResponseEntity<>("Deletado com Sucesso", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>("Não foi possível deletar", HttpStatus.BAD_REQUEST);
-		}
-	}
 }

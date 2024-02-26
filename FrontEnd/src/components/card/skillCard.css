@@ -1,0 +1,25 @@
+.skills-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    flex-wrap: wrap;
+    height: 1300px;
+    width: 1000px;
+    border: solid black double;
+  }
+  
+  .skill-card {
+    background-color: black;
+    justify-content: center;
+    align-items: center;
+   
+  }
+  
+#imgCard{
+
+    height: 100px;
+    width: 100px;
+    border: solid black double;
+}
+  

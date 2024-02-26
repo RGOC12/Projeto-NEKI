@@ -1,47 +1,24 @@
-import { createContext, useEffect, useState } from "react";
-import {api} from '../services/api'
-export const AuthContext = createContext()
+import React, { useState, createContext } from 'react';
 
-export const AutheProvider = ({Clidren}) => {
-    const [user,setUser] = useState(null);
+const AuthContext = createContext({});
 
-    useEffect(() => {
-        const loadingStorageData = async () => {
-            const storageUser = localStorage.setItem("@Auth:user",user);
-            const storageToken = localStorage.setItem("@Auth:token",token);
-    
-            if(storageUser && storageToken){
-                setUser(storageUser) 
-            }
-        }
-        loadingStorageData();
-    },[])
+const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
 
+  const signIn = () => {
+    // Implementar a lógica de autenticação
+    setUser({ name: 'Nome do Usuário' });
+  };
 
-    const signIn = async ({login, password}) => {
-        const response = await api.post(/auth/login,{
-            login,
-            password
-        })
-        if(response.data.error){
-            alert(response.data.error)
-        }else{
-            setUser(response.data)
-            api.defaults.headers.common[
-                "Authorization"
-            ] = `Beara ${response.data.token}`
-            localStorage.setItem("@Auth:token",token)
-            localStorage.setItem("@Auth:user",user)
-        }
-        
-    }
-    return(
-        <AuthContext.Provider value={{
-            user,
-            segned : !! user,
-            signIn,
-        }}>
-            {Clidren}
-        </AuthContext.Provider>
-    )
-}
+  const signOut = () => {
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, signIn, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export { AuthContext, AuthProvider };
